@@ -11,18 +11,50 @@
 <script>
 window.addEventListener("DOMContentLoaded", function() {
 
-	const canvas = document.getElementById('canvas');
-	const ctx = canvas.getContext('2d');
+	let canvasW = 986;
+	let canvasH = 725;
+	let platform = navigator.platform.toLocaleLowerCase();
 
-	console.log(ctx);
+	let platformBG = {
+		mac: {
+			url: 'img/mac.png',
+			width: 986,
+			height: 725
+		},
+		pc: {
+			url: 'img/pc.png',
+			w: 960,
+			h: 600
+		}
+	}
+
 
 	// 列表
 	var _img = new Image();
-	_img.src = 'img/mac.png';
+
+	if (platform === 'win32') {
+		_img.src = 'img/pc.png';
+		canvasW = 960;
+		canvasH = 600;
+
+	} else {
+		_img.src = 'img/mac.png';
+	}
+
+
+	// 绘制图像
+	const canvas = document.getElementById('canvas');
+	const ctx = canvas.getContext('2d');
+
+	// 设置canvas大小
+	canvas.width = canvasW;
+	canvas.height = canvasH;
+
+	console.log(ctx);
 
 	_img.onload = function() {
 
-		ctx.drawImage(_img, 0, 0, 986, 725);
+		ctx.drawImage(_img, 0, 0, canvasW, canvasH);
 
 		
 		// 高亮路径
