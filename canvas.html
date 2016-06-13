@@ -9,84 +9,65 @@
 <canvas id="canvas" width="986" height="725"></canvas>
 
 <script>
-window.addEventListener("DOMContentLoaded", function() {
-
-	let canvasW = 986;
-	let canvasH = 725;
-	let platform = navigator.platform.toLocaleLowerCase();
-
-	let platformBG = {
-		mac: {
-			url: 'img/mac.png',
-			w: 986,
-			h: 725,
-			addressBar: {
-				x: 56,
-				y: 86,
-				w: 873,
-				h: 24
-			}
-		},
-		pc: {
-			url: 'img/pc.png',
-			w: 960,
-			h: 600,
-			addressBar: {
-				x: 0,
-				y: 0,
-				w: 597,
-				h: 22
-			}
+// 常用配置
+let platformBG = {
+	mac: {
+		url: 'img/mac.png',
+		w: 986,
+		h: 725,
+		addressBar: {
+			x: 56,
+			y: 86,
+			w: 873,
+			h: 24,
+			font: '12px 黑体',
+			fontAlign: 'center'
+		}
+	},
+	pc: {
+		url: 'img/pc.png',
+		w: 960,
+		h: 600,
+		addressBar: {
+			x: 80,
+			y: 35,
+			w: 597,
+			h: 21,
+			font: '12px Microsoft YaHei, sans-serif',
+			fontAlign: 'left'
 		}
 	}
+};
+
+window.addEventListener("DOMContentLoaded", function() {
+	// 模拟文件夹下内容
+	var filesPath = [ '.DS_Store',
+				  '.git',
+				  '.gitignore',
+				  'Chat',
+				  'Command',
+				  'Connect',
+				  'Css',
+				  'Demo',
+				  'Doc',
+				  'GenerateTemHTML',
+				  'GenneratePages',
+				  'Node demo',
+				  'PhoneLogin',
+				  'README.md',
+				  'UglifyJS',
+				  'console',
+				  'iMkdirs',
+				  'iPaths',
+				  'iTinify',
+				  'nodemailer',
+				  'source-map',
+				  'sourceMap',
+				  'vedio',
+				  'zlogs' ];
 
 
-	// 列表
-	var _img = new Image();
-
-	if (platform === 'win32') {
-		_img.src = 'img/pc.png';
-		canvasW = 960;
-		canvasH = 600;
-
-	} else {
-		_img.src = 'img/mac.png';
-	}
-
-
-	// 绘制图像
-	const canvas = document.getElementById('canvas');
-	const ctx = canvas.getContext('2d');
-
-	// 设置canvas大小
-	canvas.width = canvasW;
-	canvas.height = canvasH;
-
-	console.log(ctx);
-
-	_img.onload = function() {
-
-		ctx.drawImage(_img, 0, 0, canvasW, canvasH);
-
-		
-		// 高亮路径
-		highlightRemind({
-			txt: '/Users/ZWL/Sites/Node/iPaths//Sites/Node/iPaths//Sites/Node/iPaths//Sites/Node/iPaths//Sites/Node/iPaths//Sites/Node/iPaths//Sites/Node/iPaths//Sites/Node/iPaths/canvas.html',
-			x: 56,
-			y: 87,
-			w: 873,
-			h: 22,
-			canvasContext: ctx
-		});
-
-		drawFiles(ctx);
-
-		let dataURL = canvas.toDataURL('image/png', 1.0);
-
-		// console.log(dataURL)
-
-	}
-
+	drawBGIMG('D:/SVN/pcyxc/p2p_web/src/main/webapp/themes/theme_default/wx/js/SVN/pcyxc/p2p_web/src/main/webapp/themes/theme_default/wx/js/availableRedEnvelope.js', filesPath)
 });
 
 /*
@@ -98,6 +79,8 @@ window.addEventListener("DOMContentLoaded", function() {
 		y: 0,
 		w: 20,
 		h: 20,
+		f: '14px 黑体',
+		fa: 'center',
 		bw: [1,1,1,1],
 		bs: 'solid',
 		bc: '#f90',
@@ -109,6 +92,8 @@ window.addEventListener("DOMContentLoaded", function() {
 	@y [number] canvas 上 y 坐标
 	@w [number] 宽度
 	@h [number] 高度
+	@f [string] 字体
+	@fa [string] 文字分布, left|center|right
 	@bw [array] border-width, [上 右 下 左]
 	@bs [string] border-style,
 	@bc [string] border-color, 颜色
@@ -121,6 +106,8 @@ function highlightRemind(options) {
 		y = options.y || 0, 
 		w = options.w || 100, 
 		h = options.h || 20, 
+		f = options.f || '14px 黑体',
+		fa = options.fa || 'center',
 		bw = options.bw,
 		bs = options.bs || 'solid',
 		bc = options.bc || '#f00',
@@ -128,10 +115,6 @@ function highlightRemind(options) {
 
 	// txt = !txt ? txt === '' ? '' : '没有提醒内容' : txt;
 
-	txt_X = parseInt(x + w/2);
-	txt_Y = parseInt(y + (10 + h)/2);
-	console.log('text x:' ,txt_X);
-	console.log('text y:' ,txt_Y);
 
 	ctx.save();
 	// 背景
@@ -184,15 +167,27 @@ function highlightRemind(options) {
 		
 	} // END BW
 
+	// 绘制文字
+
+	let txt_X = x;
+	let	txt_Y = parseInt(y + (10 + h)/2);
+
+	if (fa === 'center') {
+		txt_X = parseInt(x + w/2);
+	}
+
+	// console.log('text x:' ,txt_X);
+	// console.log('text y:' ,txt_Y);
+
 	ctx.fillStyle = '#c33';
 	ctx.fillStyle = '#C33';
-	ctx.font = '12px 黑体';
-	ctx.textAlign = 'center';
+	ctx.font = '12px Microsoft YaHei, 黑体, sans-serif';
+	ctx.textAlign = fa;
 
 
 	// 12px 一个中文,2个英文字母,固这里使用 12/2 =6
 	// 当文字个数过长时
-	console.log(getStrLen(txt) ,w)
+	console.log(getStrLen(txt) ,getStrLen(txt) *6 ,w)
 	if (getStrLen(txt) * 6 > w) {
 
 		txt = ( substrs( txt, 0, Math.floor(w/6) - 3 ) ) + '...';
@@ -285,7 +280,7 @@ function substrs(str, start, len) {
 }
 
 
-function drawFiles(ctx) {
+function drawFiles(ctx, filePath, dirFiles) {
 
 	let mac = {
 		icoUrl : 'img/macIcons.png',
@@ -303,42 +298,15 @@ function drawFiles(ctx) {
 	// Mac Icon
 	var _icon = new Image();
 	_icon.src = 'img/macIcons.png';
-
-	// 模拟文件夹下内容
-	filesPath = [ '.DS_Store',
-				  '.git',
-				  '.gitignore',
-				  'Chat',
-				  'Command',
-				  'Connect',
-				  'Css',
-				  'Demo',
-				  'Doc',
-				  'GenerateTemHTML',
-				  'GenneratePages',
-				  'Node demo',
-				  'PhoneLogin',
-				  'README.md',
-				  'UglifyJS',
-				  'console',
-				  'iMkdirs',
-				  'iPaths',
-				  'iTinify',
-				  'nodemailer',
-				  'source-map',
-				  'sourceMap',
-				  'vedio',
-				  'zlogs' ];
-
-				  
+  
 	// 
 	_icon.onload = function() {
 		console.log('sss')
 
 
-		for (let i = 0; i < filesPath.length; i++) {
+		for (let i = 0; i < dirFiles.length; i++) {
 
-			if (filesPath[i] === 'README.md') {
+			if (dirFiles[i] === 'README.md') {
 				highlightRemind({
 					x: mac.finder.clientX,
 					y: mac.finder.clientY + 18 * i,
@@ -352,9 +320,72 @@ function drawFiles(ctx) {
 			ctx.drawImage(_icon, 2, 2, 17, 17, mac.finder.clientX + 5, mac.finder.clientY +i*18, 17, 17);
 			ctx.fillStyle = '#272727';
 			ctx.font = '12px STHeiti';
-			ctx.fillText(filesPath[i], mac.finder.clientX + 27, mac.finder.clientY +i*18 + 15)
+			ctx.fillText(dirFiles[i], mac.finder.clientX + 27, mac.finder.clientY +i*18 + 15)
 		}
 	
+	}
+}
+
+/*
+	绘制背景
+	--------------------------------------------------
+*/
+function drawBGIMG(filePath, dirFiles) {
+
+	let canvasW = 986;
+	let canvasH = 725;
+	let platform = navigator.platform.toLocaleLowerCase();
+
+
+
+	// 列表
+	var _img = new Image();
+	var _platform = 'mac';
+	var _filePath = filePath;
+
+	if (platform === 'win32') {
+		_img.src = 'img/pc.png';
+		canvasW = 960;
+		canvasH = 600;
+		_platform = 'pc';
+	} else {
+		_img.src = 'img/mac.png';
+	}
+
+
+	// 绘制图像
+	const canvas = document.getElementById('canvas');
+	const ctx = canvas.getContext('2d');
+
+	// 设置canvas大小
+	canvas.width = canvasW;
+	canvas.height = canvasH;
+
+	console.log(ctx);
+
+	_img.onload = function() {
+
+		ctx.drawImage(_img, 0, 0, canvasW, canvasH);
+
+		
+		// 高亮路径
+		highlightRemind({
+			txt: _filePath,
+			x: platformBG[_platform].addressBar.x,
+			y: platformBG[_platform].addressBar.y,
+			w: platformBG[_platform].addressBar.w,
+			h: platformBG[_platform].addressBar.h,
+			f: platformBG[_platform].addressBar.font,
+			fa: platformBG[_platform].addressBar.fontAlign,
+			canvasContext: ctx
+		});
+
+		drawFiles(ctx, filePath, dirFiles);
+
+		let dataURL = canvas.toDataURL('image/png', 1.0);
+
+		// console.log(dataURL)
+
 	}
 }
 </script>	
