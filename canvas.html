@@ -35,6 +35,13 @@ let platformBG = {
 			h: 21,
 			font: '12px Microsoft YaHei, sans-serif',
 			fontAlign: 'left'
+		},
+		workspace: {
+			x: 0,
+			y: 0,
+			w: 100,
+			h: 100,
+			font: '12px Microsoft YaHei, sans-serif'
 		}
 	}
 };
@@ -205,15 +212,6 @@ function getStrLen(str) {
 }
 
 
-// 文字溢出
-function textOverflow(str, len) {
-	// 文字过长隐藏
-	if (getStrLen(str) > len) {
-		str = substrs(str, 0, len - 4) + '...';
-	}
-	return str;
-}
-
 /* 
 	字符串截取
 	----------------------------------------
@@ -280,7 +278,7 @@ function substrs(str, start, len) {
 }
 
 
-function drawFiles(ctx, filePath, dirFiles) {
+function drawWorkSpace(ctx, filePath, dirFiles) {
 
 	let mac = {
 		icoUrl : 'img/macIcons.png',
@@ -380,7 +378,8 @@ function drawBGIMG(filePath, dirFiles) {
 			canvasContext: ctx
 		});
 
-		drawFiles(ctx, filePath, dirFiles);
+		// 绘制工作区
+		drawWorkSpace(ctx, filePath, dirFiles);
 
 		let dataURL = canvas.toDataURL('image/png', 1.0);
 
