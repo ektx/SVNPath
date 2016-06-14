@@ -147,6 +147,9 @@ function highlightRemind(options) {
 		bw = options.bw,
 		bs = options.bs || 'solid',
 		bc = options.bc || '#f00',
+		spliceIndex = options.spliceIndex,
+		spliceLength = options.spliceLength || 0,
+		spliceStr = options.spliceStr || '...',
 		ctx = options.canvasContext;
 
 	// txt = !txt ? txt === '' ? '' : '没有提醒内容' : txt;
@@ -223,10 +226,16 @@ function highlightRemind(options) {
 
 	// 12px 一个中文,2个英文字母,固这里使用 12/2 =6
 	// 当文字个数过长时
-	console.log(getStrLen(txt) ,getStrLen(txt) *6 ,w)
+	console.log(getStrLen(txt) ,getStrLen(txt) *6 ,w, Math.floor(w/6));
+
+	if (spliceIndex) {
+		console.warn(spliceIndex, substrs( txt, 0, spliceIndex ), spliceStr)
+		console.warn(substrs( txt, getStrLen(txt) - Math.floor(w/6) - spliceStr.length, Math.floor(w/6) - spliceStr.length ), spliceStr)
+	}
+
 	if (getStrLen(txt) * 6 > w) {
 
-		txt = ( substrs( txt, 0, Math.floor(w/6) - 3 ) ) + '...';
+		txt = ( substrs( txt, 0, Math.floor(w/6) - spliceStr.length ) ) + spliceStr;
 	}
 
 	ctx.fillText(txt, txt_X, txt_Y);
@@ -378,11 +387,7 @@ function drawBGIMG(filePath, dirFiles) {
 
 	_img.onload = function() {
 
-		ctx.drawImage(_img, 0, 0, canvasW, canvasH);
-
-		
-		// 高亮路径
-		highlightRemind({
+		let addressBarData = {
 			txt: _filePath,
 			x: OSPLATFORM[OSPLATFORM.OS].addressBar.x,
 			y: OSPLATFORM[OSPLATFORM.OS].addressBar.y,
@@ -391,7 +396,18 @@ function drawBGIMG(filePath, dirFiles) {
 			f: OSPLATFORM[OSPLATFORM.OS].addressBar.font,
 			fa: OSPLATFORM[OSPLATFORM.OS].addressBar.fontAlign,
 			canvasContext: ctx
-		});
+		}
+
+		if (OSPLATFORM.OS === 'pc') {
+			console.log('Hello windows !');
+			addressBarData.spliceIndex = 3;
+			addressBarData.spliceStr   = 'xxx';
+		}
+		
+		ctx.drawImage(_img, 0, 0, canvasW, canvasH);
+
+		// 高亮路径
+		highlightRemind(addressBarData);
 
 		// 绘制工作区
 		drawWorkSpace(ctx, filePath, dirFiles);
