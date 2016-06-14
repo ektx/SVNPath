@@ -10,9 +10,11 @@
 
 <script>
 // 常用配置
-let platformBG = {
+let OSPLATFORM = {
+	OS : 'mac',
 	mac: {
 		url: 'img/mac.png',
+		icoUrl : 'img/macIcons.png',
 		w: 986,
 		h: 725,
 		addressBar: {
@@ -22,10 +24,22 @@ let platformBG = {
 			h: 24,
 			font: '12px 黑体',
 			fontAlign: 'center'
+		},
+		workspace: {
+			w: 968,
+			h: 725,
+			x: 167, // 文件列表输出 x
+			y: 110, // 文件列表输出 y
+			cw: 204,  // 文件列表宽度
+			cy: 538,  // 文件列表可用高度,
+			ico: 172, // 图标开始位置 x + 5 个偏移量
+			txt: 194, // 文字开始位置 = x + 27
+			f: '12px Microsoft YaHei, sans-serif'
 		}
 	},
 	pc: {
 		url: 'img/pc.png',
+		icoUrl : 'img/macIcons.png',
 		w: 960,
 		h: 600,
 		addressBar: {
@@ -37,16 +51,26 @@ let platformBG = {
 			fontAlign: 'left'
 		},
 		workspace: {
-			x: 0,
-			y: 0,
-			w: 100,
-			h: 100,
-			font: '12px Microsoft YaHei, sans-serif'
+			x: 167,
+			y: 120,
+			w: 785,
+			h: 472,
+			lw: 785,
+			lh: 20,
+			ico: 184,
+			txt: 205,
+			f: '12px Microsoft YaHei, sans-serif'
 		}
 	}
 };
 
 window.addEventListener("DOMContentLoaded", function() {
+	// 获取系统信息
+	OSPLATFORM.OS = navigator.platform.toLocaleLowerCase();
+	if (OSPLATFORM.OS === 'win32') {
+		OSPLATFORM.OS = 'pc';
+	}
+
 	// 模拟文件夹下内容
 	var filesPath = [ '.DS_Store',
 				  '.git',
@@ -57,6 +81,11 @@ window.addEventListener("DOMContentLoaded", function() {
 				  'Css',
 				  'Demo',
 				  'Doc',
+				  'GenerateTemHTML',
+				  'GenneratePages',
+				  'Node demo',
+				  'PhoneLogin',
+				  'README.md',
 				  'GenerateTemHTML',
 				  'GenneratePages',
 				  'Node demo',
@@ -280,45 +309,42 @@ function substrs(str, start, len) {
 
 function drawWorkSpace(ctx, filePath, dirFiles) {
 
-	let mac = {
-		icoUrl : 'img/macIcons.png',
-		finder : {
-			width: 968,
-			height: 725,
-			clientX: 167, // 文件列表输出 x
-			clientY: 110, // 文件列表输出 y
-			clientWidth: 204,  // 文件列表宽度
-			clientHeight: 538  // 文件列表可用高度
-		}
-
-	};
-
-	// Mac Icon
-	var _icon = new Image();
-	_icon.src = 'img/macIcons.png';
+	// files Icon
+	let _icon = new Image();
+	_icon.src = OSPLATFORM[OSPLATFORM.OS].icoUrl;
   
 	// 
 	_icon.onload = function() {
-		console.log('sss')
+
+		// 可显示文件总个数
+		let listLegnth = Math.floor(OSPLATFORM[OSPLATFORM.OS].workspace.h / OSPLATFORM[OSPLATFORM.OS].workspace.lh);
+		let focusFile = 'GenerateTemHTML';
+		let lightFileIndex = dirFiles.indexOf(focusFile);
+
+		dirFiles.splice(0, lightFileIndex + 1 - listLegnth)
 
 
-		for (let i = 0; i < dirFiles.length; i++) {
+		for (let i = 0; i < listLegnth; i++) {
 
-			if (dirFiles[i] === 'README.md') {
+			// 每一行的位置 y
+			let	iLinePosition = OSPLATFORM[OSPLATFORM.OS].workspace.y + OSPLATFORM[OSPLATFORM.OS].workspace.lh * i;
+
+			if (dirFiles[i] === focusFile) {
 				highlightRemind({
-					x: mac.finder.clientX,
-					y: mac.finder.clientY + 18 * i,
-					w: mac.finder.clientWidth,
-					h: 17,
+					x: OSPLATFORM[OSPLATFORM.OS].workspace.x,
+					y: iLinePosition,
+					w: OSPLATFORM[OSPLATFORM.OS].workspace.lw,
+					h: OSPLATFORM[OSPLATFORM.OS].workspace.lh,
 					canvasContext: ctx
 				});
 			}
 
 
-			ctx.drawImage(_icon, 2, 2, 17, 17, mac.finder.clientX + 5, mac.finder.clientY +i*18, 17, 17);
+			ctx.drawImage(_icon, 2, 2, 17, 17, OSPLATFORM[OSPLATFORM.OS].workspace.ico, iLinePosition, 17, 17);
+			
 			ctx.fillStyle = '#272727';
-			ctx.font = '12px STHeiti';
-			ctx.fillText(dirFiles[i], mac.finder.clientX + 27, mac.finder.clientY +i*18 + 15)
+			ctx.font = OSPLATFORM[OSPLATFORM.OS].workspace.f;
+			ctx.fillText(dirFiles[i], OSPLATFORM[OSPLATFORM.OS].workspace.txt, iLinePosition + 15)
 		}
 	
 	}
@@ -330,25 +356,14 @@ function drawWorkSpace(ctx, filePath, dirFiles) {
 */
 function drawBGIMG(filePath, dirFiles) {
 
-	let canvasW = 986;
-	let canvasH = 725;
-	let platform = navigator.platform.toLocaleLowerCase();
-
-
 
 	// 列表
-	var _img = new Image();
-	var _platform = 'mac';
-	var _filePath = filePath;
-
-	if (platform === 'win32') {
-		_img.src = 'img/pc.png';
-		canvasW = 960;
-		canvasH = 600;
-		_platform = 'pc';
-	} else {
-		_img.src = 'img/mac.png';
-	}
+	let _img = new Image();
+	let _filePath = filePath;
+	let canvasW = OSPLATFORM[OSPLATFORM.OS].w;
+	let canvasH = OSPLATFORM[OSPLATFORM.OS].h;
+	
+	_img.src = OSPLATFORM[OSPLATFORM.OS].url;
 
 
 	// 绘制图像
@@ -369,12 +384,12 @@ function drawBGIMG(filePath, dirFiles) {
 		// 高亮路径
 		highlightRemind({
 			txt: _filePath,
-			x: platformBG[_platform].addressBar.x,
-			y: platformBG[_platform].addressBar.y,
-			w: platformBG[_platform].addressBar.w,
-			h: platformBG[_platform].addressBar.h,
-			f: platformBG[_platform].addressBar.font,
-			fa: platformBG[_platform].addressBar.fontAlign,
+			x: OSPLATFORM[OSPLATFORM.OS].addressBar.x,
+			y: OSPLATFORM[OSPLATFORM.OS].addressBar.y,
+			w: OSPLATFORM[OSPLATFORM.OS].addressBar.w,
+			h: OSPLATFORM[OSPLATFORM.OS].addressBar.h,
+			f: OSPLATFORM[OSPLATFORM.OS].addressBar.font,
+			fa: OSPLATFORM[OSPLATFORM.OS].addressBar.fontAlign,
 			canvasContext: ctx
 		});
 
