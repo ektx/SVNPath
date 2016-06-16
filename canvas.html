@@ -69,6 +69,8 @@ window.addEventListener("DOMContentLoaded", function() {
 	OSPLATFORM.OS = navigator.platform.toLocaleLowerCase();
 	if (OSPLATFORM.OS === 'win32') {
 		OSPLATFORM.OS = 'pc';
+	} else if (OSPLATFORM.OS === 'macintel') {
+		OSPLATFORM.OS = 'mac'
 	}
 
 	// 模拟文件夹下内容
